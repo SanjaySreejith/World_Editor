@@ -1,0 +1,3 @@
+public enum EditMode {
+    HOUSE, OBSTACLE, TREE, GRASS, FLOWERS, BRIDGE, DIRT, DEFAULT, REMOVE
+}
