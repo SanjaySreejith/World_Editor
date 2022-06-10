@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/*
+    Several constants used by the parser have been left here should the user wish to add their respective entities back
+ */
+
 public class Parser {
 
     private static final int PROPERTY_KEY = 0;

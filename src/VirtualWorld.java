@@ -6,8 +6,44 @@ import java.util.*;
 import java.util.stream.Stream;
 
 
+/*
+    World Editor
+
+    This program makes map editing easier by displaying the map and allowing you to 'paint' on it. Run the program
+    for further instructions on controls. They will be printed in the console.
+
+    This program can edit the map using all background tiles initially included with the codebase, and the following static entities:
+    - Tree
+    - Obstacle
+    - House
+
+    This means that any entities not listed above in world.sav will NOT be copied when the program writes to its output file.
+    Save your entities elsewhere and paste them into the resulting world file to avoid this.
+
+    To add functionality:
+        - Everything you may need to change in this program to add functionality or support for more tiles and entities are contained in the following:
+            - mousePressed()
+            - keyPressed()
+            - setup()
+            - setupBgArray()
+            - writeOutFile()
+            - EditMode
+            To add entities, one must also:
+            - Add any requisite classes and methods
+                - NOTE: The only data and methods required to be added to this program are the ones that will be stored. Other methods will not be run.
+        - Comments throughout the rest of this program should help in reading it
+            - I apologize for the unreadability of setupBgArray()
+ */
+
+
+
+
+
+
 public final class VirtualWorld extends PApplet
 {
+
+    // Background tile constants. Add new background tiles here.
     private static final int GRASS_CONSTANT = 0;
     private static final int FLOWERS_CONSTANT = 1;
     private static final int DIRT_CONSTANT = 2;
@@ -19,6 +55,7 @@ public final class VirtualWorld extends PApplet
     private static final int DIRT_CORNER_CONSTANT = 8;
     private static final int BRIDGE_CONSTANT = 9;
 
+    // Texture Keys. New entity and background textures must be listed here and correspond with the constants above.
     List<String> textureKeys = new ArrayList<>(
             Arrays.asList(
                     "grass",
@@ -35,6 +72,8 @@ public final class VirtualWorld extends PApplet
     );
 
 
+    // The following 8 variables specify the lower and upper bounds for various constructor parameters that will be
+    // randomly generated for newly placed entities.
     private static final int TREE_ANIMATION_PERIOD_LBOUND = 0;
     private static final int TREE_ANIMATION_PERIOD_UBOUND = 1100;
 
@@ -46,6 +85,7 @@ public final class VirtualWorld extends PApplet
 
     private static final int OBSTACLE_ANIMATION_PERIOD_LBOUND = 1000;
     private static final int OBSTACLE_ANIMATION_PERIOD_UBOUND = 1200;
+
 
 
     private static final int TIMER_ACTION_PERIOD = 100;
@@ -66,8 +106,6 @@ public final class VirtualWorld extends PApplet
 
     private static final int DEFAULT_IMAGE_COLOR = 0x808080;
 
-    private static String LOAD_FILE_NAME = "output.txt";
-
     private static final String FAST_FLAG = "-fast";
     private static final String FASTER_FLAG = "-faster";
     private static final String FASTEST_FLAG = "-fastest";
@@ -77,8 +115,19 @@ public final class VirtualWorld extends PApplet
 
     private static double timeScale = 1.0;
 
-    private static final String outFile = "output1.txt";
+
+    // This is the name of the file the program will display. Change it to test new maps.
+    private static String LOAD_FILE_NAME = "world.sav";
+
+
+    // outFile is the output file. inFile is the input.
+    // WARNING: BEFORE TESTING A NEW MAP, MAKE SURE "LOAD_FILE_NAME" AND "outFile" ARE DIFFERENT. YOUR DISPLAY FILE WILL
+    // BE WIPED IF THEY ARE THE SAME
+    private static final String outFile = "output.txt";
     private static String inFile = "world.sav";
+
+
+    // Check the EditMode enum for more information
     private static EditMode editMode = EditMode.DEFAULT;
 
     private static final File saveFile = new File(outFile);
@@ -158,6 +207,8 @@ public final class VirtualWorld extends PApplet
     }
 
     private void setupBgArray(List<String> lines) {
+        // bgArray is not strictly necessary, but it helps keep controls concise by making dirt texture cycling easier
+        // Deleting this WILL cause problems
         for (String line : lines) {
             String[] attrs = line.split("\\s");
             if (Objects.equals(attrs[0], "background")) {
@@ -210,7 +261,6 @@ public final class VirtualWorld extends PApplet
         }
     }
 
-    // Just for debugging and for P5
     public void mousePressed() {
 
         Point pressed = mouseToPoint(mouseX, mouseY);
@@ -245,7 +295,6 @@ public final class VirtualWorld extends PApplet
                     String house_id = "house_" + pressed.x + "_" + pressed.y;
                     House house = (House) Factory.createHouse(house_id, pressed, imageStore.getImageList("house"));
                     world.tryAddEntity(house);
-                    System.out.println(house.createStoreLine());
                 }
                 break;
             case OBSTACLE:
@@ -254,7 +303,6 @@ public final class VirtualWorld extends PApplet
                     int animPeriod = Util.rand.nextInt(OBSTACLE_ANIMATION_PERIOD_LBOUND, OBSTACLE_ANIMATION_PERIOD_UBOUND);
                     Obstacle obstacle = (Obstacle) Factory.createObstacle(obstacle_id, pressed, imageStore.getImageList("obstacle"), animPeriod);
                     world.tryAddEntity(obstacle);
-                    System.out.println(obstacle.createStoreLine());
                 }
                 break;
             case TREE:
@@ -265,7 +313,6 @@ public final class VirtualWorld extends PApplet
                     int health = Util.rand.nextInt(TREE_HEALTH_LBOUND, TREE_HEALTH_UBOUND);
                     Tree tree = (Tree) Factory.createTree(tree_id, pressed, imageStore.getImageList("tree"), animPeriod, actPeriod, health);
                     world.tryAddEntity(tree);
-                    System.out.println(tree.createStoreLine());
                 }
                 break;
             case REMOVE:
